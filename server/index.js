@@ -115,63 +115,61 @@ app.get("/api/options/:ticker", async (req, res) => {
 });
 
 app.post("/api/explain", async (req, res) => {
-  try {
-    const {
-      ticker,
-      trend,
-      options,
-      marketTicker,
-      marketTrend,
-      confidenceOutlook,
-    } = req.body || {};
+    try {
+        const {
+            ticker,
+            analysis,
+            confidenceOutlook
+        } = req.body || {};
 
-    if (
-      typeof ticker !== "string" ||
-      ticker.trim() === "" ||
-      !trend ||
-      typeof trend !== "object" ||
-      !options ||
-      typeof options !== "object" ||
-      !Array.isArray(options.scenarios)
-    ) {
-      return res.status(400).json({
-        error:
-          "Provide ticker, trend results, and option results including a scenarios array.",
-      });
+        // Validate ticker
+        if (typeof ticker !== "string" || !ticker.trim()) {
+            return res.status(400).json({
+                error: "A valid stock ticker is required."
+            });
+        }
+
+        // Validate five-agent analysis
+        if (
+            !analysis ||
+            typeof analysis !== "object" ||
+            !Array.isArray(analysis.agents)
+        ) {
+            return res.status(400).json({
+                error: "Provide the complete five-agent analysis results."
+            });
+        }
+
+        // Prepare data for Gemini
+        const numbers = {
+            ticker: ticker.trim().toUpperCase(),
+
+            overallStatus: analysis.overallStatus,
+
+            agents: analysis.agents,
+
+            confidenceOutlook:
+                confidenceOutlook &&
+                typeof confidenceOutlook === "object"
+                    ? confidenceOutlook
+                    : null
+        };
+
+        // Generate AI explanation
+        const explanation = await askAI(numbers);
+
+        return res.json({
+            ticker: numbers.ticker,
+            explanation
+        });
+
+    } catch (error) {
+        console.error("AI explanation error:", error.message);
+
+        return res.status(502).json({
+            error: "Unable to generate an AI explanation."
+        });
     }
-
-    const numbers = {
-      ticker: ticker.trim().toUpperCase(),
-      trend,
-      options,
-      marketTicker:
-        typeof marketTicker === "string"
-          ? marketTicker.trim().toUpperCase()
-          : null,
-      marketTrend:
-        marketTrend && typeof marketTrend === "object"
-          ? marketTrend
-          : null,
-      confidenceOutlook:
-        confidenceOutlook &&
-        typeof confidenceOutlook === "object"
-          ? confidenceOutlook
-          : null,
-    };
-
-    const explanation = await askAI(numbers);
-
-    return res.json({
-      ticker: numbers.ticker,
-      explanation,
-    });
-  } catch (error) {
-    console.error("AI explanation error:", error.message);
-
-    return res.status(502).json({
-      error: "Unable to generate an AI explanation.",
-    });
-  }
 });
 
 app.post("/api/agents/run", async (req, res) => {
