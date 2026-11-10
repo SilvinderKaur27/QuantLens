@@ -4,199 +4,460 @@ Last updated: 10 November 2026
 
 ## 1. Current Objective
 
-Continue development of the existing QuantLens project using the current repository.
+Develop QuantLens into an AI-powered financial intelligence and options decision-support platform.
 
-The immediate priority is to establish a working development environment, run all three services, understand the existing code, and then complete missing functionality systematically.
+The platform analyses stocks through multiple dimensions using quantitative calculations, specialised agents and AI-generated explanations.
+
+Core principle:
+
+**Python calculates. Agents interpret. Express coordinates. React displays.**
+
+The immediate objective is to complete the multi-agent analysis pipeline, integrate Gemini, connect the frontend and verify the complete application.
+
+---
 
 ## 2. Environment Setup
 
 ### System
+
 - OS: Windows
 - Node.js: v26.13.0
 - npm: v11.20.0
-- Python: v3.14.2 (default)
-- Python 3.11 is also installed and is the recommended version for this project.
+- Python 3.11 installed
+- Python 3.12 virtual environment: `.venv312`
 - Git: v2.54.0
 
 ### Project Location
 
-Current working directory:
-
-`C:\Users\kaurs\Downloads\Prot-main (1)\Prot-main`
+```text
+C:\Users\kaurs\Downloads\Prot-main (1)\Prot-main
+```
 
 ### Completed
+
 - [x] Extracted project repository.
-- [x] Located the actual project root.
-- [x] Inspected the main project folders.
-- [x] Installed client npm dependencies using `npm ci`.
-- [x] Installed server npm dependencies using `npm ci`.
-- [x] Identified the Python files and their imports.
-- [x] Identified Python 3.11 as the preferred environment to try.
+- [x] Inspected project structure.
+- [x] Installed client npm dependencies.
+- [x] Installed server npm dependencies.
+- [x] Set up Python virtual environments.
+- [x] Installed Python dependencies in `.venv312`.
+- [x] Configured Express development scripts.
+- [x] Configured Flask analytics service.
+- [x] Created a separate GitHub repository for QuantLens.
+- [x] Added `.gitignore` to exclude virtual environments and environment secrets.
+- [x] Added project documentation files.
 
-### Pending
-- [ ] Create Python virtual environment using Python 3.11.
-- [ ] Activate virtual environment.
-- [ ] Upgrade pip.
-- [ ] Inspect Python dependencies and create `analytics/requirements.txt`.
-- [ ] Install Python dependencies.
-- [ ] Run Python tests.
-- [ ] Start Flask analytics service.
-- [ ] Start Express server.
-- [ ] Start React frontend.
-- [ ] Verify frontend-to-backend-to-analytics communication.
+### Important Environment Notes
 
-## 3. Current Repository Findings
+- Use `.venv312` for the Flask analytics service because `pandas-ta` is installed there.
+- Do not use the Python 3.11 `.venv` to run the Flask application.
+- Express runs on port 5000.
+- Flask runs on port 5001.
+- React/Vite frontend runs on its development port, normally 5173.
 
-### Analytics
-Files identified:
+---
 
-- `app.py`
-- `blackscholes.py`
-- `data.py`
-- `explore.py`
-- `get_trend.py`
-- `historical_volatility.py`
-- `test_blackscholes.py`
-- `test_historical_volatility.py`
-- `test_trend_manual.py`
+## 3. Current Architecture
 
-Python imports identified include Flask, pandas, NumPy, pandas-ta, yfinance, and pytest.
+### Frontend
+- React.js
+- Vite
 
-Exact compatible dependency versions still need to be established.
-
-### Server
-The server uses:
-
-- Express
+### Backend
+- Node.js
+- Express.js
 - Google Gemini SDK (`@google/genai`)
-- CORS
 - dotenv
+- CORS
 
-The server `package.json` currently has only a placeholder test script. A proper start script and test setup need to be reviewed.
+### Quantitative Analytics
+- Python
+- Flask
+- yfinance
+- pandas
+- NumPy
+- pandas-ta
 
-### Client
-- `npm ci` completed successfully.
-- npm reported four moderate vulnerabilities.
+### Architecture Flow
 
-### Server Installation
-- `npm ci` completed successfully.
-- npm reported two vulnerabilities: one moderate and one high.
-- npm also displayed a deprecation warning for `node-domexception`.
+```text
+React + Vite
+     |
+     v
+Express Backend (Port 5000)
+     |
+     +------ Analysis Agents
+     |          |
+     |          v
+     |     Agent Coordinator
+     |          |
+     |          v
+     |     Synthesis Agent
+     |
+     +------ Gemini AI
+     |
+     v
+Flask Analytics (Port 5001)
+     |
+     v
+yfinance + Quantitative Calculations
+```
 
-Do not run `npm audit fix --force` without inspecting the dependency changes first.
+---
 
-## 4. Implementation Audit — To Verify
+## 4. Quantitative Backend — Completed
 
-The following points were identified during an earlier repository review and must be rechecked against the current code before making changes:
+The Flask analytics service currently supports:
 
-- The orchestrator appeared to call the technical and options agents.
-- The risk and market-risk agent modules appeared to contain pending stubs.
-- The benchmark implementation appeared to compare a single-agent setup with a two-agent prototype.
-- The benchmark's completeness score may measure field availability rather than predictive performance.
-- The two-agent benchmark path may not call Gemini, which could make latency comparisons misleading.
-- Existing analytics tests include Black–Scholes and historical volatility tests, but the complete test suite still needs to be established.
-- The README reportedly references a Python requirements file that may be missing.
+- [x] Stock price history.
+- [x] SMA50.
+- [x] RSI14.
+- [x] MACD.
+- [x] Historical volatility.
+- [x] Black–Scholes European call pricing.
+- [x] Black–Scholes European put pricing.
+- [x] Delta calculation.
+- [x] Theta per day.
+- [x] Five underlying-price scenarios.
 
-## 5. Development Plan
+### API Verification
 
-### Phase 1 — Environment and Existing Application
-- [ ] Set up Python virtual environment.
-- [ ] Install dependencies.
+Successfully tested:
+
+- [x] `/api/analytics-health`
+- [x] `/api/stock/RELIANCE.NS`
+- [x] `/api/trend/RELIANCE.NS`
+- [x] `/api/options/RELIANCE.NS`
+
+Express-to-Flask communication has been verified.
+
+### Sample Options Results
+
+Tested with:
+
+- Ticker: RELIANCE.NS
+- Strike: 1300
+- Expiry: 30 days
+- Risk-free rate: 0.05
+
+Results included:
+
+- Call price: 54.447014
+- Put price: 24.715486
+- Call Delta: 0.636983
+- Put Delta: -0.363017
+- Historical volatility: approximately 25.2%
+
+Five stock-price scenarios were successfully generated.
+
+These are theoretical model outputs, not guaranteed market prices.
+
+---
+
+## 5. Multi-Agent System — Completed
+
+Five agents have now been implemented.
+
+### Agent 1: Technical Agent
+
+File:
+`server/agents/technicalAgent.js`
+
+Responsibilities:
+- Retrieves technical trend data.
+- Analyses SMA50.
+- Analyses RSI.
+- Analyses MACD.
+- Identifies positive and negative momentum signals.
+
+Status: COMPLETED AND TESTED.
+
+### Agent 2: Options Agent
+
+File:
+`server/agents/optionsAgent.js`
+
+Responsibilities:
+- Retrieves Black–Scholes calculations.
+- Analyses European call and put prices.
+- Reports Delta and Theta.
+- Reports historical volatility.
+- Analyses five underlying-price scenarios.
+
+Status: COMPLETED AND TESTED.
+
+### Agent 3: Risk Scenario Agent
+
+File:
+`server/agents/riskScenarioAgent.js`
+
+Responsibilities:
+- Analyses upside and downside scenarios.
+- Compares call and put prices under different stock-price movements.
+- Identifies changes in theoretical option values.
+- Communicates scenario limitations.
+
+Status: IMPLEMENTED AND TESTED.
+
+### Agent 4: Market Risk Agent
+
+File:
+`server/agents/marketRiskAgent.js`
+
+Responsibilities:
+- Analyses a broader market benchmark.
+- Currently uses NIFTY 50 (`^NSEI`) by default.
+- Examines SMA50, RSI and MACD.
+- Identifies broader market momentum.
+- Flags potentially overbought or oversold conditions.
+
+Status: IMPLEMENTED AND TESTED.
+
+### Agent 5: Synthesis Agent
+
+File:
+`server/agents/synthesisAgent.js`
+
+Responsibilities:
+- Collects findings from the four analysis agents.
+- Identifies positive signals.
+- Identifies negative signals.
+- Identifies risk-related observations.
+- Detects conflicting signals.
+- Produces an overall interpretation.
+- Returns supporting evidence.
+
+Current implementation uses rule-based keyword classification.
+
+Status: IMPLEMENTED AND TESTED.
+
+---
+
+## 6. Agent Orchestration — Completed
+
+File:
+
+`server/orchestrator/runAnalysis.js`
+
+The coordinator currently:
+
+1. Runs Technical and Options agents concurrently.
+2. Passes Options Agent results to Risk Scenario Agent.
+3. Runs Market Risk Agent using the supplied benchmark ticker.
+4. Passes all four analysis-agent results to Synthesis Agent.
+5. Collects results from all five agents.
+6. Calculates the overall execution status.
+
+### Successful API Test
+
+Endpoint:
+
+`POST /api/agents/run`
+
+Test inputs:
+
+```json
+{
+  "ticker": "RELIANCE.NS",
+  "marketTicker": "^NSEI",
+  "strike": 1300,
+  "days": 30,
+  "rate": 0.05
+}
+```
+
+Response:
+
+```text
+overallStatus: complete
+
+Technical: completed
+Options: completed
+Risk Scenario: completed
+Market Risk: completed
+Synthesis: completed
+```
+
+### Sample Synthesis Output
+
+```text
+Analysis completed by 4 agents.
+
+4 positive signals were identified.
+
+Overall interpretation:
+Positive signals currently dominate.
+
+2 risk-related observations require attention.
+```
+
+The synthesis also identified:
+- Positive technical momentum.
+- Positive broader market momentum.
+- Potentially overbought NIFTY RSI.
+- Downside scenario exposure.
+
+**Important:** Signal counts are not probabilities of future market movements.
+
+---
+
+## 7. GitHub and Repository Management
+
+- [x] Created separate QuantLens GitHub repository.
+- [x] Configured Git remote.
+- [x] Added `.gitignore`.
+- [x] Prepared project documentation.
+- [ ] Commit and push the latest five-agent implementation.
+- [ ] Verify repository contains updated documentation.
+
+Repository:
+
+`https://github.com/SilvinderKaur27/QuantLens.git`
+
+---
+
+## 8. Current Limitations
+
+The following features are not yet complete:
+
+### AI Integration
+- Gemini integration with all five agents needs to be completed and tested.
+- AI explanations must use actual agent findings as evidence.
+- Gemini failures must not break the quantitative analysis pipeline.
+
+### Agent Intelligence
+- Synthesis currently uses keyword-based classification.
+- More advanced conflict detection is required.
+- Evidence attribution can be improved.
+- Agents currently depend primarily on existing technical and quantitative APIs.
+
+### Financial Intelligence
+- News and event intelligence.
+- Fundamental analysis.
+- Options chain integration.
+- Implied volatility.
+- Put-call ratio (PCR).
+- Open interest analysis.
+- Additional Greeks: Gamma, Vega and Rho.
+
+### Evaluation
+- Historical predictive backtesting is not complete.
+- No verified predictive accuracy or calibration metrics exist.
+- Benchmark evaluation methodology needs improvement.
+
+### Product Features
+- Persistent storage.
+- User watchlists.
+- Historical analysis.
+- Evidence and news views.
+
+---
+
+## 9. Remaining Development Plan
+
+### Phase 1 — Gemini Integration (NEXT PRIORITY)
+
+- [ ] Inspect current `server/index.js`.
+- [ ] Inspect current `server/ai.js`.
+- [ ] Connect Gemini to the complete five-agent analysis.
+- [ ] Supply agent findings and metrics as context.
+- [ ] Generate a natural-language market explanation.
+- [ ] Identify conflicting signals in the explanation.
+- [ ] Ensure Gemini does not invent financial metrics.
+- [ ] Test missing API key and API failure handling.
+
+### Phase 2 — Frontend Integration
+
+- [ ] Inspect current React dashboard.
+- [ ] Connect all five agents to the frontend.
+- [ ] Display individual agent findings.
+- [ ] Display synthesis results.
+- [ ] Display supporting evidence.
+- [ ] Add loading states.
+- [ ] Add API error handling.
+- [ ] Verify complete user workflow.
+
+### Phase 3 — Testing and Reliability
+
 - [ ] Run existing Python tests.
-- [ ] Start all three services.
-- [ ] Fix startup and integration errors.
-- [ ] Verify existing API endpoints.
+- [ ] Add tests for all five agents.
+- [ ] Add orchestrator tests.
+- [ ] Test invalid ticker inputs.
+- [ ] Test missing and incomplete API responses.
+- [ ] Test Gemini failure handling.
+- [ ] Test complete end-to-end workflow.
 
-### Phase 2 — Quantitative Backend
-- [ ] Audit existing calculations.
-- [ ] Validate Black–Scholes implementation.
-- [ ] Validate technical indicators.
-- [ ] Validate historical volatility.
-- [ ] Improve input validation and error handling.
-- [ ] Add tests for missing and invalid data.
+### Phase 4 — Improve Financial Intelligence
 
-### Phase 3 — AI and Orchestration
-- [ ] Inspect every agent.
-- [ ] Identify incomplete or duplicate logic.
-- [ ] Implement missing agent functionality.
-- [ ] Improve orchestration.
-- [ ] Add synthesis and conflict handling.
-- [ ] Ensure AI explanations are grounded in actual numerical outputs.
-- [ ] Handle Gemini API failures.
-
-### Phase 4 — Additional Financial Intelligence
-- [ ] News and event retrieval.
-- [ ] Options chain and implied volatility.
-- [ ] PCR and open interest.
-- [ ] Additional option Greeks.
-- [ ] Evidence tracing.
+- [ ] Improve synthesis and conflict detection.
+- [ ] Add news/event intelligence.
+- [ ] Add fundamental analysis.
+- [ ] Explore options chain and implied volatility.
+- [ ] Add PCR and open interest.
+- [ ] Implement additional Greeks.
 
 ### Phase 5 — Evaluation
-- [ ] Audit benchmark code.
+
+- [ ] Audit existing benchmark implementation.
 - [ ] Define prediction labels and evaluation windows.
 - [ ] Prevent data leakage.
-- [ ] Implement chronological evaluation.
-- [ ] Run benchmark experiments.
-- [ ] Report actual results without inventing performance claims.
+- [ ] Implement chronological backtesting.
+- [ ] Evaluate model performance.
+- [ ] Report actual measured results.
 
-### Phase 6 — Frontend and Final Integration
-- [ ] Audit dashboard functionality.
-- [ ] Connect all required endpoints.
-- [ ] Add loading and error states.
-- [ ] Improve charts and analysis presentation.
-- [ ] Test the complete application.
+### Phase 6 — Finalisation
 
-## 6. Working Rules for This Development Session
+- [ ] Improve README.
+- [ ] Update architecture documentation.
+- [ ] Verify all environment variables.
+- [ ] Run final integration tests.
+- [ ] Commit and push all verified changes.
+
+---
+
+## 10. Development Rules
 
 - Work on one task at a time.
-- Give commands for Windows CMD unless otherwise specified.
-- Explain what each command does.
-- Do not provide large batches of code before inspecting the existing implementation.
-- Ask for command output when verification is required.
-- Do not move to the next task until the current one works.
-- Prefer fixing existing code over rewriting working components.
-- Update this file whenever a meaningful task is completed.
+- Use Windows CMD commands.
+- Explain each action briefly and simply.
+- Avoid large code changes without inspecting existing files.
+- Preserve working implementations.
+- Verify each change before moving forward.
+- Do not claim predictive accuracy without backtesting.
+- Do not describe heuristic signal scores as probabilities.
+- Keep quantitative calculations separate from LLM-generated explanations.
 
-## 7. Current Next Step
+---
 
-**Create and activate the Python 3.11 virtual environment.**
+## 11. Immediate Next Step
 
-From the project root, run:
+**Connect Gemini with the five-agent analysis pipeline.**
 
-`py -3.11 -m venv .venv`
+First inspect:
 
-Then:
+- `server/index.js`
+- `server/ai.js`
 
-` .venv\Scripts\activate`
+Understand the existing `/api/explain` endpoint before changing it.
 
-Verify:
+The desired flow:
 
-`python --version`
+```text
+Four Analysis Agents
+        |
+        v
+Synthesis Agent
+        |
+        v
+Gemini AI
+        |
+        v
+Final Financial Intelligence Report
+        |
+        v
+React Dashboard
+```
 
-Expected result: Python 3.11.x
+Current milestone:
 
-After successful verification, proceed to upgrade pip and inspect/install the Python dependencies.
-
-
-## Repository Audit — 10 November 2026
-
-Completed:
-- Reviewed frontend, backend, analytics and orchestration.
-- Identified existing quantitative functionality.
-- Identified incomplete agents and orchestration.
-- Identified Gemini startup dependency issue.
-- Reviewed existing tests and benchmark implementation.
-
-Current test status:
-- Black-Scholes: 13 tests passed.
-- Historical volatility: 8 tests passed.
-- Trend: manual live-data test only.
-
-Pending:
-1. Backend startup and error handling.
-2. Complete risk scenario agent.
-3. Complete market risk agent.
-4. Implement agent synthesis.
-5. Add automated backend tests.
-6. Improve evaluation methodology.
-7. Align frontend and documentation.
+**Five-agent analysis pipeline successfully implemented and tested.**

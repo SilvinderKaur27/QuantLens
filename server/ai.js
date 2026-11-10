@@ -1,10 +1,12 @@
 const {GoogleGenAI, Type} = require("@google/genai");
+
+async function askAI(numbers) {
 const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) throw new Error("GEMINI_API_KEY is missing from the .env file.");
 const ai = new GoogleGenAI({ apiKey });
 
-async function askAI(numbers) {
+
     if (!numbers || typeof numbers !== "object" || Array.isArray(numbers))
         throw new TypeError("numbers must be a JSON object.");
 

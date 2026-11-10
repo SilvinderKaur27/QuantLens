@@ -26,7 +26,6 @@ async function runTechnicalAgent(input = {}) {
 
     const data = await response.json();
 
-    // Support common response wrappers while preserving the API's fields.
     const result = data.trend ?? data.data ?? data;
 
     if (!result || typeof result !== "object" || Array.isArray(result)) {
@@ -37,7 +36,6 @@ async function runTechnicalAgent(input = {}) {
     const findings = [];
     const warnings = [];
 
-    // Copy only known indicator values when they exist.
     const aliases = {
       currentPrice: ["currentPrice", "current_price", "price", "close"],
       sma50: ["sma50", "sma_50", "SMA_50", "sma"],
@@ -72,7 +70,6 @@ async function runTechnicalAgent(input = {}) {
       }
     }
 
-    // Reuse an existing trend label if the endpoint provides one.
     const trendLabel =
       result.trend ??
       result.trendLabel ??
