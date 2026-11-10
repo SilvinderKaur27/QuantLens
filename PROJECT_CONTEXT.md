@@ -1,176 +1,371 @@
 # QuantLens — Project Context
 
-## 1. Project Overview
+Last updated: 10 November 2026
 
-QuantLens is an AI-powered financial intelligence and options decision-support platform.
+## 1. Project Identity
 
-Its purpose is to combine quantitative financial analysis with AI-generated explanations to help users understand market conditions, stock indicators, and options-related scenarios.
+**Project:** QuantLens — AI-Powered Financial Intelligence and Options Decision Support Platform.
 
-### Core Principle
+**Institution:** Punjab Engineering College (Deemed to be University), Chandigarh.
 
-**Python calculates. AI agents interpret. Node.js coordinates. React displays.**
+**Degree:** B.Tech Mathematics and Computing.
 
-All financial calculations should be deterministic and handled by the quantitative backend. The LLM must never be responsible for calculating financial indicators, option prices, Greeks, or numerical outputs.
+**Department:** Mathematics.
 
-The platform is intended for educational and decision-support purposes, not as a source of guaranteed investment advice.
+**Project mentor:** Dr. Neeti Gauniyal.
 
-## 2. Technology Stack
+QuantLens is an evidence-grounded financial intelligence and options decision-support platform.
 
-| Layer | Technology | Responsibility |
-|---|---|---|
-| Frontend | React, Vite | Dashboard and user interface |
-| Backend / Orchestration | Node.js, Express | API routes and coordination |
-| Quantitative Service | Python, Flask | Financial calculations |
-| AI | Google Gemini (`@google/genai`) | Interpretation and explanations |
-| Market Data | yfinance | Stock market data |
-| Visualization | Chart.js / frontend charts | Displaying financial information |
+Its purpose is to analyse stocks using multiple dimensions of financial information, identify conflicting signals, evaluate theoretical options risk and produce understandable explanations.
 
-## 3. Project Structure
+It is an educational decision-support platform, not an automated trading system or personalised investment adviser.
 
-The repository has three main components:
+## 2. Core Design Principle
 
-- `client/` — React frontend.
-- `server/` — Express backend and AI orchestration.
-- `analytics/` — Python Flask service and quantitative calculations.
+**Python calculates, agents interpret, Express coordinates, React displays.**
 
-Important files identified so far:
+- Python/Flask: Financial data retrieval and mathematical calculations.
+- Node.js/Express: API gateway, validation and agent orchestration.
+- Specialist agents: Analyse different dimensions of financial information.
+- Gemini: Interprets calculated evidence; it must not invent or modify financial calculations.
+- React/Vite: Displays analysis and visualisations.
 
-### Analytics
-- `analytics/app.py`
-- `analytics/blackscholes.py`
-- `analytics/data.py`
-- `analytics/get_trend.py`
-- `analytics/historical_volatility.py`
-- `analytics/test_blackscholes.py`
-- `analytics/test_historical_volatility.py`
-- `analytics/test_trend_manual.py`
+Never describe indicator-alignment scores as probabilities or calibrated confidence.
 
-### Server
-- `server/package.json`
-- `server/orchestrator/runAnalysis.js`
-- Agent modules and API routes (exact implementation to be verified).
+## 3. Current Architecture
 
-### Client
-- React/Vite application (individual components and pages to be documented after code review).
+```text
+React + Vite Frontend
+        |
+        v
+Node.js + Express Backend
+        |
+        +---- Technical Agent
+        |
+        +---- Options Agent
+        |
+        +---- Risk Scenario Agent
+        |
+        +---- Market Risk Agent
+        |
+        +---- Synthesis Agent
+        |
+        +---- Gemini Explanation
+        |
+        v
+Python + Flask Analytics Engine
+        |
+        +---- yfinance
+        +---- Historical prices
+        +---- Technical indicators
+        +---- Historical volatility
+        +---- Black-Scholes
+        +---- Greeks
+        +---- Option scenarios
+```
 
-## 4. Quantitative Features
+## 4. Repository and Environment
 
-The project report describes the following quantitative features:
+Repository:
+https://github.com/SilvinderKaur27/QuantLens
 
-- Stock price retrieval.
-- Simple Moving Average (SMA 50).
-- Relative Strength Index (RSI 14).
+Local project path:
+
+`C:\Users\kaurs\Downloads\Prot-main (1)\Prot-main`
+
+Main folders:
+
+```text
+Prot-main/
+  analytics/
+  server/
+    agents/
+    orchestrator/
+    ai.js
+    index.js
+    package.json
+  client/
+    src/
+  PROGRESS.md
+  PROJECT_CONTEXT.md
+```
+
+Environment:
+- Windows CMD.
+- Node.js v26.13.0.
+- npm 11.20.0.
+- Python 3.11 and Python 3.12.
+- Flask environment: `.venv312`.
+- Flask port: 5001.
+- Express port: 5000.
+- React/Vite development port: 5173.
+
+Use `.venv312` for Flask analytics.
+
+## 5. Implemented Quantitative Capabilities
+
+The Python analytics service currently supports:
+
+- Historical stock prices through yfinance.
+- SMA50.
+- RSI14.
 - MACD (12, 26, 9).
-- Log returns.
-- Annualized historical volatility.
-- Black–Scholes option pricing.
-- Option Delta and Theta.
-- Five stock-price scenario calculations.
-- Confidence Outlook: Bullish, Neutral, or Bearish, with a score from 0–100.
+- Historical volatility.
+- European Black-Scholes call and put pricing.
+- Call Delta.
+- Put Delta.
+- Call Theta.
+- Put Theta.
+- Five theoretical underlying-price scenarios:
+  - -10%
+  - -5%
+  - 0%
+  - +5%
+  - +10%
 
-**Important:** The Confidence Outlook score represents indicator alignment. It must not be presented as a statistically calibrated probability.
+Important assumptions:
+- European options.
+- Zero dividend yield in the current implementation.
+- Time to expiry calculated using days/365.
+- Risk-free rate entered as a decimal.
+- Historical volatility used when no volatility override is supplied.
+- Latest available close is not necessarily a live market quote.
 
-These features must be tested against the actual implementation before being considered complete.
+Theoretical scenarios are not predictions or actual portfolio profit/loss.
 
-## 5. AI Agent Architecture
+## 6. Implemented Agents
 
-The project is designed around specialist agents that interpret quantitative and market information.
+### Technical Agent
+Analyses:
+- Price relative to SMA50.
+- RSI.
+- MACD and its signal line.
 
-The intended architecture includes:
+### Options Agent
+Analyses:
+- Black-Scholes call and put prices.
+- Delta.
+- Theta per day.
+- Historical volatility.
+- Five option-price scenarios.
 
-- Technical analysis.
-- Options analysis.
-- Risk analysis.
-- Market risk analysis.
-- A final synthesis / explanation layer.
+### Risk Scenario Agent
+Analyses:
+- Largest downside and upside scenarios.
+- Call-price behaviour.
+- Put-price behaviour.
+- Scenario-related warnings.
 
-The current implementation and orchestration of each agent must be inspected. Do not assume that every planned agent is fully implemented merely because its module exists.
+### Market Risk Agent
+Analyses the broader benchmark, currently NIFTY 50 (`^NSEI`):
+- Benchmark price relative to SMA50.
+- RSI.
+- MACD.
 
-### AI Design Rule
+### Synthesis Agent
+Combines the four analytical agents:
+- Identifies positive findings.
+- Identifies negative findings.
+- Identifies risk-related observations.
+- Produces a rule-based overall interpretation.
 
-AI agents should:
-- Interpret calculated metrics.
-- Explain market conditions.
-- Identify risks and conflicting signals.
-- Provide understandable summaries.
-- Reference the data they used wherever possible.
+Signal counts are not probabilities.
 
-AI agents should NOT:
-- Independently calculate financial values.
-- Invent market data.
-- Present unsupported claims as facts.
-- Treat an indicator score as a guaranteed probability.
+The current implementation has five agents in total: four analytical agents and one synthesis agent.
 
-## 6. Planned Improvements
+## 7. Gemini Integration
 
-The following areas are part of the broader project goals. Their implementation status must be verified:
+Library:
+`@google/genai`
 
-- News and event retrieval.
-- Fundamental analysis.
-- Options chain data.
-- Implied volatility (IV).
-- Put-call ratio (PCR).
-- Open interest analysis.
-- Additional Greeks: Gamma, Vega, and Rho.
-- Agent synthesis and conflict checking.
-- Evidence tracing and citations.
-- Historical backtesting.
-- Benchmarking and evaluation.
-- Better error handling and automated tests.
-- Improved dashboard views for news, evidence, and analysis.
+Files:
+- `server/ai.js`
+- `server/index.js`
 
-## 7. Benchmarking and Evaluation
+Environment configuration:
 
-The project report proposes comparing different analysis configurations:
+`server/.env`
 
-- S0: Quantitative analysis only.
-- S1: Single Gemini analysis.
-- S2: Single Gemini analysis with dated news.
-- S3: Multi-agent analysis.
-- S4: Ablation experiments that remove selected features or agents.
+Expected variables:
 
-Possible evaluation metrics include:
+```env
+GEMINI_API_KEY=your_api_key
+GEMINI_MODEL=gemini-3.5-flash-lite
+```
 
-- Accuracy and Macro-F1.
-- Mean Absolute Error (MAE) for future realized volatility.
-- Brier score and log loss, only when evaluating genuine probabilities for a defined outcome.
-- Precision, recall, and F1 for risk-event detection.
-- Evidence support and unsupported-claim rate.
-- Numerical correctness.
-- Latency and API cost.
+Never commit `.env` or expose API keys.
 
-### Avoiding Data Leakage
+Gemini returns structured JSON:
 
-- Only use information available at or before the analysis timestamp.
-- Use chronological train, validation, and test splits.
-- Account for overlapping five-session prediction windows.
-- Save predictions before future outcomes are known.
+```json
+{
+  "summary": "...",
+  "outlook": "..."
+}
+```
 
-The report describes the benchmark design but does not establish that benchmark results have been successfully produced. Do not claim predictive accuracy without running and validating the experiments.
+Gemini is instructed to:
+- Interpret supplied calculations.
+- Explain conflicting signals.
+- Explain option Greeks and scenarios.
+- Distinguish historical data from theoretical model outputs.
+- Avoid unsupported predictions.
+- Avoid personalised buy/sell recommendations.
+- Avoid inventing missing values.
 
-## 8. Development Rules
+Temporary Gemini 503 capacity errors have occurred. A successful end-to-end request was subsequently verified.
 
-1. Inspect existing code before modifying it.
-2. Understand the current architecture before adding new features.
-3. Keep financial calculations separate from AI interpretation.
-4. Avoid unnecessary rewrites.
-5. Preserve working functionality.
-6. Test each change before moving to the next.
-7. Keep dependencies documented.
-8. Do not hardcode API keys or secrets.
-9. Handle missing market data and API failures gracefully.
-10. Document important architectural decisions.
+## 8. Verified API Routes
 
-## 9. Development Workflow
+Express:
 
-Work in small, verifiable steps:
+- `GET /api/health`
+- `GET /api/analytics-health`
+- `GET /api/stock/:ticker`
+- `GET /api/trend/:ticker`
+- `GET /api/options/:ticker`
+- `POST /api/explain`
+- `POST /api/agents/run`
+- `POST /api/analyze`
 
-1. Inspect the existing implementation.
-2. Run the project.
-3. Identify errors and missing functionality.
-4. Fix one issue at a time.
-5. Test the changes.
-6. Update `PROGRESS.md`.
-7. Continue to the next feature.
+The combined endpoint `/api/analyze`:
 
-The goal is to build a reliable, working project rather than merely adding features that look complete in a presentation.
+1. Validates stock and option inputs.
+2. Runs all five agents.
+3. Passes the complete analysis object to Gemini.
+4. Returns analytical results and AI explanation.
+5. Preserves analytical results if Gemini fails.
+
+Example request:
+
+```json
+{
+  "ticker": "RELIANCE.NS",
+  "strike": 1300,
+  "days": 30,
+  "rate": 0.05
+}
+```
+
+## 9. Verified End-to-End Test
+
+Tested successfully on 10 November 2026.
+
+Ticker: `RELIANCE.NS`
+
+Benchmark: `^NSEI`
+
+Inputs:
+- Strike: 1300
+- Days to expiry: 30
+- Risk-free rate: 0.05
+
+Verified:
+- Express started successfully.
+- Flask analytics started successfully.
+- Stock data retrieval worked.
+- Technical indicators worked.
+- Black-Scholes calculations worked.
+- All five agents completed.
+- Synthesis returned findings.
+- Gemini generated a structured explanation.
+- `/api/analyze` returned `aiStatus: completed`.
+
+The successful response contained:
+
+```json
+{
+  "overallStatus": "complete",
+  "aiStatus": "completed",
+  "aiError": null
+}
+```
+
+This confirms that the local backend pipeline works for the tested request.
+
+It does not establish predictive accuracy or research effectiveness.
+
+## 10. Research Objectives
+
+The research question defined in the synopsis is:
+
+Does combining source-grounded financial news analysis with independently calculated technical and options-risk indicators and structured agents make an AI risk assessment more reliable than a single-LLM system or a quantitative-only system?
+
+Research questions:
+
+- RQ1: Does event-aware, dated financial news improve risk assessment?
+- RQ2: Does structured multi-agent analysis improve evidence support and risk identification compared with a single LLM?
+- RQ3: Can the system identify conflicting signals and produce uncertainty assessments that correspond to historical reliability?
+
+These are hypotheses, not established findings.
+
+## 11. Research and Evaluation Work Still Pending
+
+The following are not yet implemented or experimentally established:
+
+- Fundamentals Agent.
+- News and Event Intelligence Agent.
+- Dated and source-linked news retrieval.
+- Evidence-grounded news analysis.
+- Historical backtesting engine.
+- S0–S4 benchmark runner and experiments.
+- Chronological train, validation and test evaluation.
+- Historical option-chain data.
+- Implied volatility and open-interest analysis.
+- Gamma, Vega and Rho.
+- Confidence calibration.
+- Evidence-support evaluation.
+- Ablation studies.
+- Statistical comparison of system variants.
+- Final experimental results.
+
+The research report and presentation contain proposed methodology and benchmark designs. Do not report proposed experiments as completed results.
+
+## 12. Planned S0–S4 Benchmark
+
+- S0: Quantitative-only.
+- S1: Single LLM with quantitative metrics.
+- S2: Single LLM with quantitative metrics and dated news.
+- S3: Structured multi-agent system.
+- S4: Ablation studies removing individual components.
+
+The variants must use identical historical cases and information constraints.
+
+The synopsis proposes a five-session forward return:
+
+R(t,5) = (P(t+5) - P(t)) / P(t)
+
+Proposed labels:
+- Bullish: greater than +1%.
+- Neutral: between -1% and +1%.
+- Bearish: less than -1%.
+
+Prevent look-ahead bias and information leakage.
+
+## 13. Next Development Priorities
+
+1. Review and verify the existing implementation.
+2. Build the historical backtesting engine.
+3. Implement S0–S4 benchmarking.
+4. Add source-grounded news/event intelligence.
+5. Add fundamental analysis.
+6. Improve risk and uncertainty evaluation.
+7. Complete the React dashboard.
+8. Run experiments and document results.
+
+Research literature review and mathematical formula verification will be handled in a separate research workspace.
+
+## 14. Development Rules
+
+- Work one step at a time.
+- Explain the purpose of each change.
+- Use exact Windows CMD commands.
+- Avoid unnecessary rewrites.
+- Inspect existing code before suggesting modifications.
+- Preserve the CommonJS structure in Express (`require`, `module.exports`).
+- Python remains the source of truth for calculations.
+- Gemini interprets supplied evidence only.
+- Never expose API keys.
+- Never claim experimental results that have not been measured.
+- Explain technical concepts in beginner-friendly language.
+- Keep `PROJECT_CONTEXT.md` and `PROGRESS.md` updated after significant milestones.

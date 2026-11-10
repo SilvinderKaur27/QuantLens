@@ -220,6 +220,93 @@ app.post("/api/agents/run", async (req, res) => {
   }
 });
 
+app.post("/api/analyze", async (req, res) => {
+    try {
+        const {
+            ticker,
+            strike,
+            days,
+            rate,
+            confidenceOutlook
+        } = req.body || {};
+
+        // Validate inputs
+        if (typeof ticker !== "string" || !ticker.trim()) {
+            return res.status(400).json({
+                error: "A valid stock ticker is required."
+            });
+        }
+
+        const numericInputs = { strike, days, rate };
+
+        for (const [name, value] of Object.entries(numericInputs)) {
+            if (
+                value === undefined ||
+                value === null ||
+                value === "" ||
+                !Number.isFinite(Number(value))
+            ) {
+                return res.status(400).json({
+                    error: `A valid numeric ${name} is required.`
+                });
+            }
+        }
+
+        if (Number(strike) <= 0 || Number(days) <= 0) {
+            return res.status(400).json({
+                error: "Strike and days must be positive."
+            });
+        }
+
+        const normalizedTicker = ticker.trim().toUpperCase();
+
+        // Step 1: Run all five agents
+        const analysis = await runAnalysis({
+            ticker: normalizedTicker,
+            strike: Number(strike),
+            days: Number(days),
+            rate: Number(rate)
+        });
+
+        // Step 2: Send complete agent results to Gemini
+        let explanation = null;
+        let aiStatus = "completed";
+        let aiError = null;
+
+        try {
+            explanation = await askAI({
+                ticker: normalizedTicker,
+                analysis,
+                confidenceOutlook:
+                    confidenceOutlook &&
+                    typeof confidenceOutlook === "object"
+                        ? confidenceOutlook
+                        : null
+            });
+        } catch (error) {
+            aiStatus = "failed";
+            aiError = error.message;
+            console.error("Gemini error:", error.message);
+        }
+
+        // Step 3: Return everything together
+        return res.json({
+            ticker: normalizedTicker,
+            analysis,
+            aiStatus,
+            explanation,
+            aiError
+        });
+
+    } catch (error) {
+        console.error("Complete analysis error:", error.message);
+
+        return res.status(500).json({
+            error: "Unable to complete financial analysis."
+        });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Express server is running at http://localhost:${PORT}.`);
 });
