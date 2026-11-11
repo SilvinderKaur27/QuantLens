@@ -2,6 +2,8 @@ import math
 import pandas as pd
 
 def calculate_historical_volatility(closing_prices) -> float:
+
+
     prices = pd.to_numeric(
         pd.Series(closing_prices),
         errors = "coerce"
@@ -32,3 +34,35 @@ def calculate_historical_volatility(closing_prices) -> float:
     if not math.isfinite(annualized_volatility):
         raise ValueError("Calculated volatility is not finite.")
     return annualized_volatility
+
+def calculate_rolling_historical_volatility(
+    closing_prices,
+    window: int = 20
+) -> pd.Series:
+
+    prices = pd.to_numeric(
+        pd.Series(closing_prices),
+        errors="coerce"
+    )
+
+    if window < 3:
+        raise ValueError("Window must be at least 3.")
+
+    if prices.isna().any():
+        raise ValueError("Closing prices contain missing or invalid values.")
+
+    if len(prices) < window:
+        raise ValueError("Not enough closing prices for the selected window.")
+
+    if not all(
+        math.isfinite(float(price)) and price > 0
+        for price in prices
+    ):
+        raise ValueError("Closing prices must be finite and greater than zero.")
+
+    volatility = prices.rolling(window=window).apply(
+        lambda window_prices: calculate_historical_volatility(window_prices),
+        raw=False
+    )
+
+    return volatility
